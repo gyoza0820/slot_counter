@@ -5,7 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>設定判別カウンターD</title>
     <style>
-        body { background-color: #121212; color: #ffffff; font-family: 'Helvetica Neue', Arial, sans-serif; margin: 0; padding: 10px; padding-bottom: 30px; user-select: none; -webkit-user-select: none; }
+        body { background-color: #121212; color: #ffffff; font-family: 'Helvetica Neue', Arial, sans-serif; margin: 0; padding: 10px; padding-bottom: 30px; user-select: none; -webkit-user-select: none; box-sizing: border-box; }
+        * { box-sizing: border-box; }
         button { white-space: nowrap; cursor: pointer; }
         .container { max-width: 500px; margin: 0 auto; }
         .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
@@ -61,12 +62,12 @@
         .estimation-section { background-color: #1e1e1e; padding: 12px; border-radius: 8px; border: 1px solid #2d2d2d; margin-bottom: 20px; }
         table { width: 100%; border-collapse: collapse; font-size: 0.75rem; text-align: center; }
         th, td { border: 1px solid #333; padding: 4px; }
-        .table-input { width: 40px; background-color: #000; border: 1px solid #555; color: #fff; text-align: center; }
+        .table-input { width: 100%; max-width: 50px; background-color: #000; border: 1px solid #555; color: #fff; text-align: center; }
         .graph-bar-wrap { flex-grow: 1; background-color: #222; height: 16px; border-radius: 3px; margin: 0 8px; }
         .graph-bar { background: linear-gradient(90deg, #1199ff, #00ffcc); height: 100%; width: 0%; }
         
-        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.85); z-index: 1000; justify-content: center; align-items: center; padding: 15px; }
-        .modal-content { background-color: #1e1e1e; border: 2px solid #00ffcc; border-radius: 12px; width: 100%; max-width: 400px; padding: 20px; }
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.85); z-index: 1000; justify-content: center; align-items: center; padding: 10px; }
+        .modal-content { background-color: #1e1e1e; border: 2px solid #00ffcc; border-radius: 12px; width: 100%; max-width: 400px; padding: 20px; word-wrap: break-word; overflow-y: auto; max-height: 90vh; }
         .btn-close { width: 100%; background-color: #333; color: #fff; padding: 10px; border-radius: 6px; margin-top: 15px; }
     </style>
 </head>
@@ -84,7 +85,7 @@
 
     <div class="storage-section">
         <div class="save-row">
-            <input type="text" id="modelNameInput" class="model-name-input" placeholder="機種名・データを入力">
+            <input type="text" id="modelNameInput" class="model-name-input" placeholder="機種名を入力">
             <button class="btn-save" onclick="saveCurrentData()">保存</button>
         </div>
         <div class="model-list" id="modelListContainer"></div>
@@ -92,7 +93,7 @@
 
     <div class="game-section">
         <div class="game-row">
-            <div class="game-label">現在のゲーム数</div>
+            <div class="game-label">現在のG数</div>
             <div class="game-input-wrap">
                 <input type="number" id="inputCurrentGames" class="game-input" value="0" oninput="updateGames()">
                 <button class="btn-add" onclick="addGames(100)">+100G</button>
@@ -100,7 +101,7 @@
             </div>
         </div>
         <div class="game-row">
-            <div class="game-label">打ち始めゲーム数</div>
+            <div class="game-label">打ち始めG数</div>
             <div class="game-input-wrap">
                 <input type="number" id="inputStartGames" class="game-input" value="0" oninput="updateGames()">
                 <button class="btn-add" onclick="confirmClearGames()" style="color:#ff4444;">リセット</button>
@@ -121,15 +122,23 @@
     </div>
 
     <div class="estimation-section">
+        <div style="text-align:center; color:#ffcc00; font-weight:bold; margin-bottom:8px;">📊 設定差（分母を入力）</div>
+        <div style="text-align:center; font-size:0.75rem; color:#aaa; margin-bottom:10px;">例：1/120のときは「120」と入力してください</div>
         <div class="est-table-scroll"><table id="estimationTable"><thead id="tableHead"></thead><tbody id="tableBody"></tbody></table></div>
-        <div class="graph-container" id="graphContainer"></div>
+        <div class="graph-container" id="graphContainer" style="margin-top:15px;"></div>
     </div>
 </div>
 
 <div class="modal" id="manualModal">
     <div class="modal-content">
-        <div class="modal-title" style="color:#00ffcc; text-align:center;">使い方</div>
-        <p style="font-size:0.9rem;">役の「-」「＋」でカウント、「リセ」でその役を0に、「消」で削除します。<br>保存機能で機種データを残せます。</p>
+        <div class="modal-title" style="color:#00ffcc; text-align:center; font-weight:bold; margin-bottom:10px;">使い方ガイド</div>
+        <ul style="font-size:0.9rem; padding-left:20px; line-height:1.6;">
+            <li><strong>カウント：</strong>各役の「＋」で増やす。「－」で修正。</li>
+            <li><strong>役の編集：</strong>名前・色・確率分母を自由に設定可。</li>
+            <li><strong>保存機能：</strong>名前を付けて「保存」すればデータを記録。</li>
+            <li><strong>削除：</strong>保存データはチップの「×」で消去可能。</li>
+            <li><strong>判別：</strong>確率を入力すると、リアルタイムで設定推測グラフを表示！</li>
+        </ul>
         <button class="btn-close" onclick="toggleModal(false)">閉じる</button>
     </div>
 </div>
@@ -177,6 +186,7 @@
     function confirmResetRole(idx) { if(confirm(`${rolesData[idx].name}のカウントをリセットする？`)) resetRole(idx); }
     function confirmDeleteRole(idx) { if(confirm(`${rolesData[idx].name}を削除していい？`)) deleteRole(idx); }
     function confirmClearGames() { if(confirm("ゲーム数をリセットする？")) clearGames(); }
+    function confirmDeleteData(k) { if(confirm("保存データを削除する？")) { localStorage.removeItem(k); loadSavedList(); } }
 
     function resetRole(idx) { rolesData[idx].count = 0; renderCards(); calculateProbabilities(); }
     function deleteRole(idx) { rolesData.splice(idx, 1); renderAll(); }
@@ -187,7 +197,7 @@
         thead.innerHTML = `<tr><th>設定</th>` + rolesData.map(r => `<th>${r.name}</th>`).join('') + `</tr>`;
         tbody.innerHTML = "";
         for (let s = 0; s < 6; s++) {
-            tbody.innerHTML += `<tr><td style="font-weight:bold;">${s+1}</td>` + rolesData.map((r, i) => `<td><input type="number" class="table-input" value="${r.pDenominators[s]||''}" oninput="rolesData[${i}].pDenominators[${s}]=this.value; calculateProbabilities()"></td>`).join('') + `</tr>`;
+            tbody.innerHTML += `<tr><td style="font-weight:bold;">${s+1}</td>` + rolesData.map((r, i) => `<td><input type="number" class="table-input" placeholder="" value="${r.pDenominators[s]||''}" oninput="rolesData[${i}].pDenominators[${s}]=this.value; calculateProbabilities()"></td>`).join('') + `</tr>`;
         }
     }
 
@@ -231,10 +241,10 @@
     function addGames(v) { document.getElementById('inputCurrentGames').value = (parseInt(document.getElementById('inputCurrentGames').value)||0) + v; updateGames(); }
     function clearGames() { document.getElementById('inputCurrentGames').value = 0; document.getElementById('inputStartGames').value = 0; updateGames(); }
     function toggleModal(s) { document.getElementById('manualModal').style.display = s ? 'flex' : 'none'; }
-    function fullResetAll() { if(confirm("全データをリセットしていい？")) { rolesData.forEach(r => r.count=0); czData={total:0, success:0}; document.getElementById('inputCurrentGames').value=0; document.getElementById('inputStartGames').value=0; renderAll(); } }
-    function saveCurrentData() { const n = document.getElementById('modelNameInput').value; if(!n) return alert("機種名を入力"); localStorage.setItem("slot_"+n, JSON.stringify({rolesData, czData, c:document.getElementById('inputCurrentGames').value, s:document.getElementById('inputStartGames').value})); loadSavedList(); }
-    function loadSavedList() { const c = document.getElementById('modelListContainer'); c.innerHTML = ""; for(let i=0; i<localStorage.length; i++) { const k = localStorage.key(i); if(k.startsWith("slot_")) c.innerHTML += `<div class="model-chip" onclick="loadData('${k}')">${k.replace("slot_","")}<button class="btn-delete-chip" onclick="localStorage.removeItem('${k}'); loadSavedList(); event.stopPropagation()">×</button></div>`; } }
-    function loadData(k) { const d = JSON.parse(localStorage.getItem(k)); rolesData=d.rolesData; czData=d.czData; document.getElementById('inputCurrentGames').value=d.c; document.getElementById('inputStartGames').value=d.s; renderAll(); }
+    function fullResetAll() { if(confirm("全データをリセットしていい？")) { rolesData.forEach(r => { r.count=0; r.pDenominators = ["", "", "", "", "", ""]; }); czData={total:0, success:0}; document.getElementById('inputCurrentGames').value=0; document.getElementById('inputStartGames').value=0; renderAll(); } }
+    function saveCurrentData() { const n = document.getElementById('modelNameInput').value; if(!n) return alert("機種名を入力"); localStorage.setItem("slot_"+n, JSON.stringify({rolesData, czData, c:document.getElementById('inputCurrentGames').value, s:document.getElementById('inputStartGames').value})); loadSavedList(); alert(n + " を保存しました！"); }
+    function loadSavedList() { const c = document.getElementById('modelListContainer'); c.innerHTML = ""; for(let i=0; i<localStorage.length; i++) { const k = localStorage.key(i); if(k.startsWith("slot_")) c.innerHTML += `<div class="model-chip" onclick="loadData('${k}')">${k.replace("slot_","")}<button class="btn-delete-chip" onclick="confirmDeleteData('${k}'); event.stopPropagation()">×</button></div>`; } }
+    function loadData(k) { const d = JSON.parse(localStorage.getItem(k)); rolesData=d.rolesData; czData=d.czData; document.getElementById('inputCurrentGames').value=d.c; document.getElementById('inputStartGames').value=d.s; renderAll(); alert(k.replace("slot_","") + " を読み込みました！"); }
 </script>
 </body>
 </html>
