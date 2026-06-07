@@ -3,318 +3,80 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>ガチ設定判別カウンター（保存機能付）</title>
+    <title>設定判別カウンターD</title>
     <style>
-        body {
-            background-color: #121212;
-            color: #ffffff;
-            font-family: 'Helvetica Neue', Arial, sans-serif;
-            margin: 0;
-            padding: 10px;
-            padding-bottom: 30px;
-            user-select: none;
-            -webkit-user-select: none;
-        }
-        .container {
-            max-width: 500px;
-            margin: 0 auto;
-        }
-        .header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 15px;
-        }
-        h1 {
-            font-size: 1.1rem;
-            margin: 0;
-            color: #e0e0e0;
-        }
-        .header-btns {
-            display: flex;
-            gap: 8px;
-        }
-        .btn-top {
-            background-color: #333;
-            color: #fff;
-            border: 1px solid #555;
-            padding: 6px 10px;
-            border-radius: 4px;
-            font-size: 0.8rem;
-            cursor: pointer;
-        }
+        body { background-color: #121212; color: #ffffff; font-family: 'Helvetica Neue', Arial, sans-serif; margin: 0; padding: 10px; padding-bottom: 30px; user-select: none; -webkit-user-select: none; }
+        button { white-space: nowrap; cursor: pointer; }
+        .container { max-width: 500px; margin: 0 auto; }
+        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
+        h1 { font-size: 1.1rem; margin: 0; color: #e0e0e0; }
+        .header-btns { display: flex; gap: 8px; }
+        .btn-top { background-color: #333; color: #fff; border: 1px solid #555; padding: 6px 10px; border-radius: 4px; font-size: 0.8rem; }
         .btn-manual { color: #00ffcc; border-color: #00ffcc; }
         .btn-add-role { color: #ffcc00; border-color: #ffcc00; }
 
-        /* セーブ・ロード管理エリア */
-        .storage-section {
-            background-color: #1a2332;
-            padding: 12px;
-            border-radius: 8px;
-            margin-bottom: 15px;
-            border: 1px solid #2b3d52;
-        }
-        .save-row {
-            display: flex;
-            gap: 8px;
-            margin-bottom: 10px;
-        }
-        .model-name-input {
-            flex-grow: 1;
-            background-color: #000;
-            border: 1px solid #444;
-            color: #fff;
-            padding: 6px 10px;
-            border-radius: 4px;
-            font-size: 0.9rem;
-        }
+        .storage-section { background-color: #1a2332; padding: 12px; border-radius: 8px; margin-bottom: 15px; border: 1px solid #2b3d52; }
+        .save-row { display: flex; gap: 8px; margin-bottom: 10px; }
+        .model-name-input { flex-grow: 1; background-color: #000; border: 1px solid #444; color: #fff; padding: 6px 10px; border-radius: 4px; font-size: 0.9rem; }
         .btn-save { background-color: #00aa66; color: white; border: none; padding: 6px 12px; border-radius: 4px; font-weight: bold; font-size: 0.85rem; }
-        .btn-save:active { background-color: #008855; }
-        .load-title { font-size: 0.75rem; color: #8fa0b5; margin-bottom: 6px; font-weight: bold; }
         .model-list { display: flex; flex-wrap: wrap; gap: 6px; }
-        .model-chip {
-            background-color: #253346;
-            color: #fff;
-            border: 1px solid #3d526b;
-            padding: 4px 8px;
-            border-radius: 15px;
-            font-size: 0.8rem;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            cursor: pointer;
-        }
-        .model-chip:active { background-color: #3d526b; }
-        .btn-delete-chip {
-            background: none;
-            border: none;
-            color: #ff4444;
-            font-weight: bold;
-            padding: 0 2px;
-            cursor: pointer;
-            font-size: 0.85rem;
-        }
+        .model-chip { background-color: #253346; color: #fff; border: 1px solid #3d526b; padding: 4px 8px; border-radius: 15px; font-size: 0.8rem; display: flex; align-items: center; gap: 6px; cursor: pointer; }
+        .btn-delete-chip { background: none; border: none; color: #ff4444; font-weight: bold; padding: 0 2px; cursor: pointer; font-size: 0.85rem; }
 
-        /* ゲーム数入力エリア */
-        .game-section {
-            background-color: #1e1e1e;
-            padding: 12px;
-            border-radius: 8px;
-            margin-bottom: 15px;
-            border: 1px solid #2d2d2d;
-        }
-        .game-row {
-            display: flex;
-            align-items: center;
-            margin-bottom: 10px;
-        }
-        .game-row:last-child { margin-bottom: 0; }
+        .game-section { background-color: #1e1e1e; padding: 12px; border-radius: 8px; margin-bottom: 15px; border: 1px solid #2d2d2d; }
+        .game-row { display: flex; align-items: center; margin-bottom: 10px; }
         .game-label { width: 90px; font-size: 0.85rem; color: #aaa; }
         .game-input-wrap { display: flex; flex-grow: 1; gap: 5px; }
-        .game-input {
-            width: 70px;
-            background-color: #000;
-            border: 1px solid #444;
-            color: #fff;
-            font-size: 1.1rem;
-            padding: 6px;
-            border-radius: 4px;
-            text-align: center;
-        }
-        .btn-add {
-            flex-grow: 1;
-            background-color: #2a2a2a;
-            border: 1px solid #444;
-            color: #fff;
-            padding: 6px 0;
-            border-radius: 4px;
-            font-size: 0.85rem;
-            font-weight: bold;
-        }
-        .btn-add:active { background-color: #444; }
-        .actual-games-display {
-            background-color: #252525;
-            padding: 8px;
-            border-radius: 6px;
-            text-align: center;
-            font-size: 1rem;
-            font-weight: bold;
-            color: #ffcc00;
-            margin-top: 5px;
-        }
+        .game-input { width: 70px; background-color: #000; border: 1px solid #444; color: #fff; font-size: 1.1rem; padding: 6px; border-radius: 4px; text-align: center; }
+        .btn-add { flex-grow: 1; background-color: #2a2a2a; border: 1px solid #444; color: #fff; padding: 6px 0; border-radius: 4px; font-size: 0.85rem; font-weight: bold; }
+        .actual-games-display { background-color: #252525; padding: 8px; border-radius: 6px; text-align: center; font-size: 1rem; font-weight: bold; color: #ffcc00; margin-top: 5px; }
 
-        /* カウンターグリッド */
-        .counter-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 12px;
-            margin-bottom: 20px;
-        }
-        .counter-card {
-            border-radius: 12px;
-            padding: 10px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
-            position: relative;
-            box-sizing: border-box;
-            border: 2px solid rgba(255,255,255,0.1);
-        }
-        .counter-card:active { transform: scale(0.97); filter: brightness(1.2); }
+        .counter-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-bottom: 20px; }
+        .counter-card { border-radius: 12px; padding: 10px; display: flex; flex-direction: column; align-items: center; border: 2px solid rgba(255,255,255,0.1); }
+        .card-top { display: flex; width: 100%; justify-content: flex-end; align-items: center; gap: 4px; margin-bottom: 8px; }
+        .role-name-input { flex-grow: 1; width: 40%; background: rgba(0, 0, 0, 0.4); border: none; border-bottom: 1px solid rgba(255,255,255,0.6); color: inherit; text-align: center; font-size: 0.85rem; font-weight: bold; padding: 2px 0; border-radius: 2px; }
+        .dark-text .role-name-input { border-bottom: 1px solid rgba(0,0,0,0.6); color: #000; }
+        .color-select { background: rgba(0,0,0,0.6); color: #fff; border: none; font-size: 0.7rem; padding: 2px; border-radius: 4px; }
+        .count-num { font-size: 2.2rem; font-weight: bold; margin: 2px 0; font-family: monospace; }
+        .prob-display { font-size: 0.85rem; font-weight: bold; background: rgba(0,0,0,0.2); padding: 2px 6px; border-radius: 10px; }
+        .card-bottom-btns { display: flex; width: 100%; gap: 4px; margin-top: 8px; }
+        .btn-card-action { flex: 1; background: rgba(0, 0, 0, 0.5); color: #fff; border: 1px solid rgba(255,255,255,0.3); padding: 8px 0; border-radius: 6px; font-size: 0.8rem; font-weight: bold; }
+        .btn-card-reset { flex: 0.8; background: rgba(255, 255, 255, 0.2); color: #fff; border: 1px solid rgba(255,255,255,0.3); padding: 8px 0; border-radius: 6px; font-size: 0.8rem; }
+        .btn-delete { flex: 0.8; background: rgba(200, 0, 0, 0.6) !important; }
 
-        /* グラデーションカラーバリエーション */
         .bg-red { background: linear-gradient(135deg, #8b0000, #cc1111); color: #fff; }
         .bg-green { background: linear-gradient(135deg, #006400, #11aa11); color: #fff; }
         .bg-yellow { background: linear-gradient(135deg, #8b8b00, #dddd22); color: #000; }
         .bg-purple { background: linear-gradient(135deg, #4b0082, #8a2be2); color: #fff; }
         .bg-blue { background: linear-gradient(135deg, #004b87, #0088ff); color: #fff; }
-        .bg-white { background: linear-gradient(135deg, #d3d3d3, #ffffff); color: #000; }
-        .bg-orange { background: linear-gradient(135deg, #aa4400, #ff6600); color: #fff; }
-        .bg-pink { background: linear-gradient(135deg, #990044, #ff3388); color: #fff; }
-        
         .dark-text { color: #000000 !important; }
 
-        /* カード内の入力・操作 */
-        .card-top {
-            display: flex;
-            width: 100%;
-            justify-content: space-between;
-            align-items: center;
-            gap: 4px;
-            margin-bottom: 4px;
-        }
-        .role-name-input {
-            flex-grow: 1;
-            width: 50%;
-            background: rgba(0, 0, 0, 0.4);
-            border: none;
-            border-bottom: 1px solid rgba(255,255,255,0.6);
-            color: inherit;
-            text-align: center;
-            font-size: 0.85rem;
-            font-weight: bold;
-            padding: 2px 0;
-            border-radius: 2px;
-        }
-        .dark-text .role-name-input { border-bottom: 1px solid rgba(0,0,0,0.6); color: #000; }
-        
-        /* 色選択セレクトボックス */
-        .color-select {
-            background: rgba(0,0,0,0.6);
-            color: #fff;
-            border: none;
-            font-size: 0.7rem;
-            padding: 2px;
-            border-radius: 4px;
-        }
-        .count-num { font-size: 2.2rem; font-weight: bold; margin: 2px 0; font-family: monospace; }
-        .prob-display { font-size: 0.85rem; font-weight: bold; background: rgba(0,0,0,0.2); padding: 2px 6px; border-radius: 10px; }
-        
-        /* カード下部ボタン */
-        .card-bottom-btns { display: flex; width: 100%; gap: 6px; margin-top: 8px; }
-        .btn-card-action {
-            flex-grow: 1;
-            background: rgba(0, 0, 0, 0.5);
-            color: #fff;
-            border: 1px solid rgba(255,255,255,0.3);
-            padding: 6px 0;
-            border-radius: 6px;
-            font-size: 0.75rem;
-            font-weight: bold;
-            cursor: pointer;
-        }
-        .dark-text .btn-card-action { background: rgba(255, 255, 255, 0.6); color: #000; border: 1px solid rgba(0,0,0,0.3); }
-        .btn-delete { background: rgba(200, 0, 0, 0.6) !important; color: #fff !important; }
+        .cz-section { background-color: #1e1e1e; padding: 12px; border-radius: 8px; margin-bottom: 15px; border: 1px solid #ffcc00; }
+        .cz-grid { display: flex; justify-content: center; align-items: center; gap: 40px; margin-top: 8px; }
+        .cz-col { display: flex; flex-direction: column; align-items: center; }
+        .cz-count-box { font-size: 2rem; font-weight: bold; margin: 5px 0; font-family: monospace; }
+        .btn-cz-ctrl { width: 50px; background-color: #2a2a2a; border: 1px solid #444; color: #fff; padding: 8px 0; border-radius: 4px; font-weight: bold; }
+        .cz-rate-banner { background-color: #252525; padding: 8px; border-radius: 6px; text-align: center; font-size: 1rem; font-weight: bold; color: #00ffcc; margin-top: 10px; }
 
-        /* チャンスゾーン（CZ）エリア */
-        .cz-section {
-            background-color: #1e1e1e;
-            padding: 12px;
-            border-radius: 8px;
-            margin-bottom: 15px;
-            border: 1px solid #ffcc00;
-        }
-        .cz-grid {
-            display: flex;
-            justify-content: space-around;
-            align-items: center;
-            gap: 15px;
-            margin-top: 8px;
-        }
-        .cz-col {
-            text-align: center;
-            flex: 1;
-        }
-        .cz-count-box {
-            font-size: 2rem;
-            font-weight: bold;
-            margin: 5px 0;
-            font-family: monospace;
-        }
-        .cz-btns {
-            display: flex;
-            gap: 6px;
-        }
-        .btn-cz-ctrl {
-            flex: 1;
-            background-color: #2a2a2a;
-            border: 1px solid #444;
-            color: #fff;
-            padding: 8px 0;
-            border-radius: 4px;
-            font-weight: bold;
-            cursor: pointer;
-        }
-        .btn-cz-ctrl:active { background-color: #444; }
-        .btn-cz-plus { background-color: #ff6600; color: #fff; border: none; }
-        .btn-cz-plus:active { background-color: #cc5500; }
-        .cz-rate-banner {
-            background-color: #252525;
-            padding: 8px;
-            border-radius: 6px;
-            text-align: center;
-            font-size: 1.05rem;
-            font-weight: bold;
-            color: #00ffcc;
-            margin-top: 10px;
-            border: 1px solid #333;
-        }
-
-        /* 設定判別エリア */
         .estimation-section { background-color: #1e1e1e; padding: 12px; border-radius: 8px; border: 1px solid #2d2d2d; margin-bottom: 20px; }
-        .title-container { display: flex; align-items: baseline; flex-wrap: wrap; gap: 8px; margin-bottom: 10px; }
-        .section-title { font-size: 1rem; color: #ffcc00; margin: 0; border-left: 4px solid #ffcc00; padding-left: 8px; }
-        .section-desc { font-size: 0.7rem; color: #aaa; margin: 0; font-weight: normal; }
-        .est-table-scroll { overflow-x: auto; margin-bottom: 15px; }
-        table { width: 100%; border-collapse: collapse; font-size: 0.8rem; text-align: center; }
-        th, td { border: 1px solid #333; padding: 6px 4px; }
-        th { background-color: #2a2a2a; color: #aaa; }
-        .table-input { width: 45px; background-color: #000; border: 1px solid #555; color: #fff; padding: 3px; text-align: center; border-radius: 3px; }
-        .result-title { font-size: 0.9rem; color: #00ffcc; margin-bottom: 8px; font-weight: bold; }
-        .graph-container { display: flex; flex-direction: column; gap: 6px; }
-        .graph-row { display: flex; align-items: center; font-size: 0.85rem; }
-        .graph-label { width: 50px; font-weight: bold; }
-        .graph-bar-wrap { flex-grow: 1; background-color: #222; height: 16px; border-radius: 3px; overflow: hidden; margin: 0 8px; border: 1px solid #333; }
-        .graph-bar { background: linear-gradient(90deg, #1199ff, #00ffcc); height: 100%; width: 0%; transition: width 0.3s ease; }
-        .graph-val { width: 45px; text-align: right; font-family: monospace; font-weight: bold; }
-
-        /* モーダル */
-        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.85); z-index: 1000; justify-content: center; align-items: center; padding: 15px; box-sizing: border-box; }
-        .modal-content { background-color: #1e1e1e; border: 2px solid #00ffcc; border-radius: 12px; width: 100%; max-width: 400px; padding: 20px; box-sizing: border-box; max-height: 90vh; overflow-y: auto; }
-        .modal-title { font-size: 1.1rem; color: #00ffcc; margin: 0 0 15px 0; text-align: center; border-bottom: 1px solid #333; padding-bottom: 8px; }
-        .manual-step { margin-bottom: 12px; background: #252525; padding: 10px; border-radius: 6px; border-left: 3px solid #0088ff; }
-        .manual-step h3 { margin: 0 0 5px 0; font-size: 0.9rem; color: #fff; }
-        .manual-step p { margin: 0; font-size: 0.75rem; color: #ccc; line-height: 1.4; }
-        .btn-close { width: 100%; background-color: #333; color: #fff; border: 1px solid #555; padding: 8px 0; border-radius: 6px; font-weight: bold; cursor: pointer; margin-top: 10px; }
+        table { width: 100%; border-collapse: collapse; font-size: 0.75rem; text-align: center; }
+        th, td { border: 1px solid #333; padding: 4px; }
+        .table-input { width: 40px; background-color: #000; border: 1px solid #555; color: #fff; text-align: center; }
+        .graph-bar-wrap { flex-grow: 1; background-color: #222; height: 16px; border-radius: 3px; margin: 0 8px; }
+        .graph-bar { background: linear-gradient(90deg, #1199ff, #00ffcc); height: 100%; width: 0%; }
+        
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.85); z-index: 1000; justify-content: center; align-items: center; padding: 15px; }
+        .modal-content { background-color: #1e1e1e; border: 2px solid #00ffcc; border-radius: 12px; width: 100%; max-width: 400px; padding: 20px; }
+        .btn-close { width: 100%; background-color: #333; color: #fff; padding: 10px; border-radius: 6px; margin-top: 15px; }
     </style>
 </head>
 <body>
 
 <div class="container">
     <div class="header">
-        <h1>ガチ設定判別カウンター</h1>
+        <h1>設定判別カウンターD</h1>
         <div class="header-btns">
+            <button class="btn-top" onclick="fullResetAll()" style="color:#ff4444; border-color:#ff4444;">全リセット</button>
             <button class="btn-top btn-manual" onclick="toggleModal(true)">使い方</button>
             <button class="btn-top btn-add-role" onclick="addNewRole()">役を追加</button>
         </div>
@@ -325,9 +87,7 @@
             <input type="text" id="modelNameInput" class="model-name-input" placeholder="機種名・データを入力">
             <button class="btn-save" onclick="saveCurrentData()">保存</button>
         </div>
-        <div class="load-title">保存データ一覧（タップで読込）</div>
-        <div class="model-list" id="modelListContainer">
-            </div>
+        <div class="model-list" id="modelListContainer"></div>
     </div>
 
     <div class="game-section">
@@ -343,96 +103,33 @@
             <div class="game-label">打ち始めゲーム数</div>
             <div class="game-input-wrap">
                 <input type="number" id="inputStartGames" class="game-input" value="0" oninput="updateGames()">
-                <button class="btn-add" onclick="clearGames()" style="color:#ff4444;">リセット</button>
+                <button class="btn-add" onclick="confirmClearGames()" style="color:#ff4444;">リセット</button>
             </div>
         </div>
-        <div class="actual-games-display">
-            実戦回転数: <span id="displayActualGames">0</span> G
-        </div>
+        <div class="actual-games-display">実戦回転数: <span id="displayActualGames">0</span> G</div>
     </div>
 
-    <div class="counter-grid" id="counterGrid">
-        </div>
+    <div class="counter-grid" id="counterGrid"></div>
 
     <div class="cz-section">
-        <div class="section-title" style="margin-bottom: 5px;">🎯 チャンスゾーン（CZ）成功確率</div>
+        <div style="color:#ffcc00; font-weight:bold; text-align:center;">🎯 チャンスゾーン（CZ）成功確率</div>
         <div class="cz-grid">
-            <div class="cz-col">
-                <div style="font-size:0.8rem; color:#aaa;">CZ突入</div>
-                <div class="cz-count-box" id="czTotalNum">0</div>
-                <div class="cz-btns">
-                    <button class="btn-cz-ctrl" onclick="changeCZ('total', -1)">減</button>
-                    <button class="btn-cz-ctrl btn-cz-plus" onclick="changeCZ('total', 1)">＋</button>
-                </div>
-            </div>
-            <div class="cz-col">
-                <div style="font-size:0.8rem; color:#aaa;">CZ成功</div>
-                <div class="cz-count-box" id="czSuccessNum" style="color: #00ffcc;">0</div>
-                <div class="cz-btns">
-                    <button class="btn-cz-ctrl" onclick="changeCZ('success', -1)">減</button>
-                    <button class="btn-cz-ctrl btn-cz-plus" style="background-color:#00aa66;" onclick="changeCZ('success', 1)">＋</button>
-                </div>
-            </div>
+            <div class="cz-col"><div>CZ突入</div><div class="cz-count-box" id="czTotalNum">0</div><div style="display:flex;gap:4px;"><button class="btn-cz-ctrl" onclick="changeCZ('total', -1)">-</button><button class="btn-cz-ctrl" onclick="changeCZ('total', 1)">＋</button></div></div>
+            <div class="cz-col"><div>CZ成功</div><div class="cz-count-box" id="czSuccessNum" style="color: #00ffcc;">0</div><div style="display:flex;gap:4px;"><button class="btn-cz-ctrl" onclick="changeCZ('success', -1)">-</button><button class="btn-cz-ctrl" onclick="changeCZ('success', 1)">＋</button></div></div>
         </div>
         <div class="cz-rate-banner" id="czRateDisplay">成功率: 0.0% (0 / 0)</div>
     </div>
 
     <div class="estimation-section">
-        <div class="title-container">
-            <div class="section-title">📊 設定判別推測</div>
-            <div class="section-desc">※各小役の確率「分母」を入力してください（例: 1/120なら「120」）</div>
-        </div>
-        <div class="est-table-scroll">
-            <table id="estimationTable">
-                <thead id="tableHead">
-                    </thead>
-                <tbody id="tableBody">
-                    </tbody>
-            </table>
-        </div>
-
-        <div class="result-title">【推測結果】各設定の期待度</div>
-        <div class="graph-container">
-            <script>
-                for(let i=1; i<=6; i++) {
-                    document.write(`
-                        <div class="graph-row">
-                            <div class="graph-label">設定${i}</div>
-                            <div class="graph-bar-wrap">
-                                <div class="graph-bar" id="bar-setting-${i}"></div>
-                            </div>
-                            <div class="graph-val" id="val-setting-${i}">16.7%</div>
-                        </div>
-                    `);
-                }
-            </script>
-        </div>
+        <div class="est-table-scroll"><table id="estimationTable"><thead id="tableHead"></thead><tbody id="tableBody"></tbody></table></div>
+        <div class="graph-container" id="graphContainer"></div>
     </div>
 </div>
 
 <div class="modal" id="manualModal">
     <div class="modal-content">
-        <div class="modal-title">ガチ設定判別カウンターの使い方</div>
-        <div class="manual-step">
-            <h3>1. 小役をカウントする</h3>
-            <p>各カードの「＋」でカウントアップ、「減」でダウンします。上の入力欄で役名変更や背景色グラデーションのカスタムが可能です。</p>
-        </div>
-        <div class="manual-step">
-            <h3>2. 回転数を入力する</h3>
-            <p>現在のゲーム数と打ち始めゲーム数を入力すると、実戦回転数が自動計算され、各小役のリアルタイム出現率分母が表示されます。</p>
-        </div>
-        <div class="manual-step">
-            <h3>3. CZ確率をカウントする</h3>
-            <p>チャンスゾーンの突入と成功回数をそれぞれ独立してカウントし、成功確率（分数・百分率）を即座に割り出します。</p>
-        </div>
-        <div class="manual-step">
-            <h3>4. 設定を推測する</h3>
-            <p>判別エリアの表（縦が設定、横が小役）に、解析サイトなどの小役確率「分母」を入力すると、カウントされた数値と実戦回転数からリアルタイムに各設定の濃厚度をパーセンテージで可視化します。</p>
-        </div>
-        <div class="manual-step">
-            <h3>5. データの保存機能</h3>
-            <p>一番上の入力欄に機種名などを入れて「保存」を押すとデータが端末に記録され、下部のチップをタップするだけでいつでも一瞬で復元・再開できます。</p>
-        </div>
+        <div class="modal-title" style="color:#00ffcc; text-align:center;">使い方</div>
+        <p style="font-size:0.9rem;">役の「-」「＋」でカウント、「リセ」でその役を0に、「消」で削除します。<br>保存機能で機種データを残せます。</p>
         <button class="btn-close" onclick="toggleModal(false)">閉じる</button>
     </div>
 </div>
@@ -444,292 +141,100 @@
         { name: "ベル", count: 0, color: "bg-yellow", pDenominators: ["", "", "", "", "", ""] },
         { name: "チャンス目", count: 0, color: "bg-purple", pDenominators: ["", "", "", "", "", ""] }
     ];
-
     let czData = { total: 0, success: 0 };
+    const colorOptions = [{val:"bg-red",label:"赤"},{val:"bg-green",label:"緑"},{val:"bg-yellow",label:"黄"},{val:"bg-purple",label:"紫"},{val:"bg-blue",label:"青"}];
 
-    const colorOptions = [
-        { val: "bg-red", label: "赤" },
-        { val: "bg-green", label: "緑" },
-        { val: "bg-yellow", label: "黄" },
-        { val: "bg-purple", label: "紫" },
-        { val: "bg-blue", label: "青" },
-        { val: "bg-white", label: "白" },
-        { val: "bg-orange", label: "橙" },
-        { val: "bg-pink", label: "桃" }
-    ];
-
-    window.onload = function() {
-        renderAll();
-        loadSavedList();
-    };
-
-    function renderAll() {
-        renderCards();
-        renderTable();
-        updateGames();
-        updateCZDisplay();
-    }
+    window.onload = function() { renderAll(); loadSavedList(); };
+    function renderAll() { renderCards(); renderTable(); updateGraph(); updateGames(); updateCZDisplay(); }
 
     function renderCards() {
         const grid = document.getElementById('counterGrid');
         grid.innerHTML = "";
-        
         rolesData.forEach((role, idx) => {
             const card = document.createElement('div');
             card.className = `counter-card ${role.color}`;
-            if(role.color === 'bg-yellow' || role.color === 'bg-white') {
-                card.classList.add('dark-text');
-            }
-
-            let selectHtml = `<select class="color-select" onchange="changeCardColor(${idx}, this.value)">`;
-            colorOptions.forEach(opt => {
-                selectHtml += `<option value="${opt.val}" ${role.color === opt.val ? 'selected' : ''}>${opt.label}</option>`;
-            });
-            selectHtml += `</select>`;
-
+            if(role.color === 'bg-yellow') card.classList.add('dark-text');
             card.innerHTML = `
                 <div class="card-top">
-                    <input type="text" class="role-name-input" value="${role.name}" onchange="changeRoleName(${idx}, this.value)">
-                    ${selectHtml}
+                    <input type="text" class="role-name-input" value="${role.name}" onchange="rolesData[${idx}].name=this.value; renderTable()">
+                    <select class="color-select" onchange="rolesData[${idx}].color=this.value; renderCards()">
+                        ${colorOptions.map(o=>`<option value="${o.val}" ${role.color===o.val?'selected':''}>${o.label}</option>`).join('')}
+                    </select>
                 </div>
                 <div class="count-num" id="count-val-${idx}">${role.count}</div>
                 <div class="prob-display" id="prob-val-${idx}">1/0.0</div>
                 <div class="card-bottom-btns">
-                    <button class="btn-card-action" onclick="countAction(${idx}, -1)">減</button>
-                    <button class="btn-card-action" onclick="countAction(${idx}, 1)" style="font-size:1.2rem; padding:2px 0;">＋</button>
-                    <button class="btn-card-action btn-delete" onclick="deleteRole(${idx})">消</button>
+                    <button class="btn-card-action" onclick="countAction(${idx}, -1)">-</button>
+                    <button class="btn-card-action" onclick="countAction(${idx}, 1)">＋</button>
+                    <button class="btn-card-reset" onclick="confirmResetRole(${idx})">リセ</button>
+                    <button class="btn-card-action btn-delete" onclick="confirmDeleteRole(${idx})">消</button>
                 </div>
             `;
             grid.appendChild(card);
         });
     }
 
+    function confirmResetRole(idx) { if(confirm(`${rolesData[idx].name}のカウントをリセットする？`)) resetRole(idx); }
+    function confirmDeleteRole(idx) { if(confirm(`${rolesData[idx].name}を削除していい？`)) deleteRole(idx); }
+    function confirmClearGames() { if(confirm("ゲーム数をリセットする？")) clearGames(); }
+
+    function resetRole(idx) { rolesData[idx].count = 0; renderCards(); calculateProbabilities(); }
+    function deleteRole(idx) { rolesData.splice(idx, 1); renderAll(); }
+    
     function renderTable() {
         const thead = document.getElementById('tableHead');
         const tbody = document.getElementById('tableBody');
-        
-        let headHtml = `<tr><th style="background:#2a2a2a; color:#aaa; min-width:60px;">設定</th>`;
-        rolesData.forEach(role => {
-            headHtml += `<th>${role.name}</th>`;
-        });
-        headHtml += `</tr>`;
-        thead.innerHTML = headHtml;
-        
+        thead.innerHTML = `<tr><th>設定</th>` + rolesData.map(r => `<th>${r.name}</th>`).join('') + `</tr>`;
         tbody.innerHTML = "";
         for (let s = 0; s < 6; s++) {
-            const row = document.createElement('tr');
-            let tdInputs = `<td style="font-weight:bold; background:#1e1e1e; color:#fff;">設定${s + 1}</td>`;
-            
-            rolesData.forEach((role, rIdx) => {
-                const val = role.pDenominators[s] !== undefined ? role.pDenominators[s] : "";
-                tdInputs += `<td><input type="number" step="any" class="table-input" value="${val}" oninput="updateTableProb(${rIdx}, ${s}, this.value)"></td>`;
-            });
-            
-            row.innerHTML = tdInputs;
-            tbody.appendChild(row);
+            tbody.innerHTML += `<tr><td style="font-weight:bold;">${s+1}</td>` + rolesData.map((r, i) => `<td><input type="number" class="table-input" value="${r.pDenominators[s]||''}" oninput="rolesData[${i}].pDenominators[${s}]=this.value; calculateProbabilities()"></td>`).join('') + `</tr>`;
         }
     }
 
-    function countAction(idx, val) {
-        rolesData[idx].count = Math.max(0, rolesData[idx].count + val);
-        document.getElementById(`count-val-${idx}`).innerText = rolesData[idx].count;
-        calculateProbabilities();
+    function updateGraph() {
+        const cont = document.getElementById('graphContainer');
+        cont.innerHTML = "";
+        for(let i=1; i<=6; i++) cont.innerHTML += `<div style="display:flex; align-items:center; margin-bottom:4px;"><div style="width:30px; font-weight:bold;">${i}</div><div class="graph-bar-wrap"><div class="graph-bar" id="bar-${i}"></div></div><div id="val-${i}" style="width:40px; font-weight:bold;">16.7%</div></div>`;
     }
 
-    function changeRoleName(idx, name) {
-        rolesData[idx].name = name;
-        renderTable();
-    }
-
-    function changeCardColor(idx, colorClass) {
-        rolesData[idx].color = colorClass;
-        renderCards();
-    }
-
-    function updateTableProb(roleIdx, settingIdx, val) {
-        if (val === "") {
-            rolesData[roleIdx].pDenominators[settingIdx] = "";
-        } else {
-            rolesData[roleIdx].pDenominators[settingIdx] = parseFloat(val) || 0;
-        }
-        calculateProbabilities();
-    }
-
-    function addNewRole() {
-        rolesData.push({
-            name: "新小役",
-            count: 0,
-            color: "bg-blue",
-            pDenominators: ["", "", "", "", "", ""]
-        });
-        renderAll();
-    }
-
-    function deleteRole(idx) {
-        if(confirm(`${rolesData[idx].name}を削除してよろしいですか？`)) {
-            rolesData.splice(idx, 1);
-            renderAll();
-        }
-    }
-
-    function changeCZ(type, val) {
-        czData[type] = Math.max(0, czData[type] + val);
-        if (czData.success > czData.total) {
-            czData.total = czData.success;
-        }
-        updateCZDisplay();
-    }
-
-    function updateCZDisplay() {
-        document.getElementById('czTotalNum').innerText = czData.total;
-        document.getElementById('czSuccessNum').innerText = czData.success;
-        const czPercent = czData.total > 0 ? (czData.success / czData.total * 100).toFixed(1) : "0.0";
-        document.getElementById('czRateDisplay').innerText = `成功率: ${czPercent}% (${czData.success} / ${czData.total})`;
-    }
-
-    function updateGames() {
-        const cur = parseInt(document.getElementById('inputCurrentGames').value, 10) || 0;
-        const start = parseInt(document.getElementById('inputStartGames').value, 10) || 0;
-        const actual = Math.max(0, cur - start);
-        document.getElementById('displayActualGames').innerText = actual;
-        calculateProbabilities();
-    }
-
-    function addGames(val) {
-        const input = document.getElementById('inputCurrentGames');
-        input.value = (parseInt(input.value, 10) || 0) + val;
-        updateGames();
-    }
-
-    function clearGames() {
-        document.getElementById('inputCurrentGames').value = 0;
-        document.getElementById('inputStartGames').value = 0;
-        updateGames();
-    }
+    function countAction(idx, v) { rolesData[idx].count = Math.max(0, rolesData[idx].count + v); renderCards(); calculateProbabilities(); }
+    function addNewRole() { rolesData.push({ name: "新役", count: 0, color: "bg-blue", pDenominators: ["", "", "", "", "", ""] }); renderAll(); }
 
     function calculateProbabilities() {
         const actualGames = parseInt(document.getElementById('displayActualGames').innerText, 10) || 0;
-
-        rolesData.forEach((role, idx) => {
-            const display = document.getElementById(`prob-val-${idx}`);
-            if (role.count > 0 && actualGames > 0) {
-                display.innerText = `1/${(actualGames / role.count).toFixed(1)}`;
-            } else {
-                display.innerText = `1/0.0`;
-            }
-        });
-
-        let posteriors = [1/6, 1/6, 1/6, 1/6, 1/6, 1/6]; 
-        let hasValidInput = false;
-
+        rolesData.forEach((r, i) => document.getElementById(`prob-val-${i}`).innerText = (r.count > 0 && actualGames > 0) ? `1/${(actualGames/r.count).toFixed(1)}` : "1/0.0");
+        let likelihoods = [1,1,1,1,1,1];
         if (actualGames > 0) {
-            for (let s = 0; s < 6; s++) {
-                let logLikelihood = 0;
-                rolesData.forEach(role => {
-                    const k = role.count;
-                    const denom = role.pDenominators[s];
-                    if (denom !== "" && denom > 0) {
-                        hasValidInput = true;
-                        const p = 1 / denom;
-                        const lambda = actualGames * p;
-                        if (lambda > 0) {
-                            logLikelihood += k * Math.log(lambda) - lambda;
-                        }
-                    }
-                });
-                posteriors[s] = Math.exp(logLikelihood);
-            }
-
-            const sumPost = posteriors.reduce((a, b) => a + b, 0);
-            if (hasValidInput && sumPost > 0) {
-                posteriors = posteriors.map(p => p / sumPost);
-            } else {
-                posteriors = [1/6, 1/6, 1/6, 1/6, 1/6, 1/6];
+            for(let s=0; s<6; s++) {
+                let logL = 0;
+                rolesData.forEach(r => { if(r.pDenominators[s]>0) { let p=1/r.pDenominators[s]; logL += r.count * Math.log(p) + (actualGames-r.count) * Math.log(1-p); }});
+                likelihoods[s] = Math.exp(logL);
             }
         }
-
-        for (let i = 1; i <= 6; i++) {
-            const percent = (posteriors[i - 1] * 100).toFixed(1);
-            document.getElementById(`bar-setting-${i}`).style.width = `${percent}%`;
-            document.getElementById(`val-setting-${i}`).innerText = `${percent}%`;
+        let sum = likelihoods.reduce((a,b)=>a+b, 0);
+        for(let i=1; i<=6; i++) {
+            let p = (sum > 0) ? (likelihoods[i-1]/sum*100).toFixed(1) : "16.7";
+            document.getElementById(`bar-${i}`).style.width = p + "%";
+            document.getElementById(`val-${i}`).innerText = p + "%";
         }
     }
 
-    function saveCurrentData() {
-        const name = document.getElementById('modelNameInput').value.trim();
-        if (!name) {
-            alert("機種名またはデータ名を入力してください。");
-            return;
-        }
-
-        const saveData = {
-            rolesData: rolesData,
-            czData: czData,
-            curGames: document.getElementById('inputCurrentGames').value,
-            startGames: document.getElementById('inputStartGames').value
-        };
-
-        localStorage.setItem(`slot_data_${name}`, JSON.stringify(saveData));
-        document.getElementById('modelNameInput').value = "";
-        loadSavedList();
-        alert(`「${name}」のデータを保存しました！`);
+    function changeCZ(type, val) { czData[type] = Math.max(0, czData[type] + val); if (czData.success > czData.total) czData.total = czData.success; updateCZDisplay(); }
+    function updateCZDisplay() { 
+        document.getElementById('czTotalNum').innerText = czData.total; 
+        document.getElementById('czSuccessNum').innerText = czData.success; 
+        const p = czData.total > 0 ? (czData.success/czData.total*100).toFixed(1) : "0.0";
+        document.getElementById('czRateDisplay').innerText = `成功率: ${p}% (${czData.success} / ${czData.total})`;
     }
-
-    function loadSavedList() {
-        const container = document.getElementById('modelListContainer');
-        container.innerHTML = "";
-        let count = 0;
-
-        for (let i = 0; i < localStorage.length; i++) {
-            const key = localStorage.key(i);
-            if (key.startsWith("slot_data_")) {
-                count++;
-                const displayName = key.replace("slot_data_", "");
-                const chip = document.createElement('div');
-                chip.className = 'model-chip';
-                chip.setAttribute('onclick', `loadData('${key}')`);
-                chip.innerHTML = `
-                    <span>${displayName}</span>
-                    <button class="btn-delete-chip" onclick="deleteData('${key}', event)">×</button>
-                `;
-                container.appendChild(chip);
-            }
-        }
-        if(count === 0) {
-            container.innerHTML = `<div style="font-size:0.75rem; color:#555;">保存されたデータはありません</div>`;
-        }
-    }
-
-    function loadData(key) {
-        const data = JSON.parse(localStorage.getItem(key));
-        if (data) {
-            rolesData = data.rolesData;
-            rolesData.forEach(role => {
-                if(!role.pDenominators) {
-                    role.pDenominators = ["", "", "", "", "", ""];
-                }
-            });
-            czData = data.czData || { total: 0, success: 0 };
-            document.getElementById('inputCurrentGames').value = data.curGames || 0;
-            document.getElementById('inputStartGames').value = data.startGames || 0;
-            renderAll();
-            alert(`「${key.replace("slot_data_", "")}」のデータを読み込みました！`);
-        }
-    }
-
-    function deleteData(key, event) {
-        event.stopPropagation();
-        const displayName = key.replace("slot_data_", "");
-        if (confirm(`「${displayName}」のセーブデータを削除しますか？`)) {
-            localStorage.removeItem(key);
-            loadSavedList();
-        }
-    }
-
-    function toggleModal(show) {
-        document.getElementById('manualModal').style.display = show ? 'flex' : 'none';
-    }
+    
+    function updateGames() { const g = Math.max(0, (parseInt(document.getElementById('inputCurrentGames').value)||0) - (parseInt(document.getElementById('inputStartGames').value)||0)); document.getElementById('displayActualGames').innerText = g; calculateProbabilities(); }
+    function addGames(v) { document.getElementById('inputCurrentGames').value = (parseInt(document.getElementById('inputCurrentGames').value)||0) + v; updateGames(); }
+    function clearGames() { document.getElementById('inputCurrentGames').value = 0; document.getElementById('inputStartGames').value = 0; updateGames(); }
+    function toggleModal(s) { document.getElementById('manualModal').style.display = s ? 'flex' : 'none'; }
+    function fullResetAll() { if(confirm("全データをリセットしていい？")) { rolesData.forEach(r => r.count=0); czData={total:0, success:0}; document.getElementById('inputCurrentGames').value=0; document.getElementById('inputStartGames').value=0; renderAll(); } }
+    function saveCurrentData() { const n = document.getElementById('modelNameInput').value; if(!n) return alert("機種名を入力"); localStorage.setItem("slot_"+n, JSON.stringify({rolesData, czData, c:document.getElementById('inputCurrentGames').value, s:document.getElementById('inputStartGames').value})); loadSavedList(); }
+    function loadSavedList() { const c = document.getElementById('modelListContainer'); c.innerHTML = ""; for(let i=0; i<localStorage.length; i++) { const k = localStorage.key(i); if(k.startsWith("slot_")) c.innerHTML += `<div class="model-chip" onclick="loadData('${k}')">${k.replace("slot_","")}<button class="btn-delete-chip" onclick="localStorage.removeItem('${k}'); loadSavedList(); event.stopPropagation()">×</button></div>`; } }
+    function loadData(k) { const d = JSON.parse(localStorage.getItem(k)); rolesData=d.rolesData; czData=d.czData; document.getElementById('inputCurrentGames').value=d.c; document.getElementById('inputStartGames').value=d.s; renderAll(); }
 </script>
-
 </body>
 </html>
