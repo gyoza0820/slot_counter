@@ -172,6 +172,8 @@
         .bg-white { background: linear-gradient(135deg, #d3d3d3, #ffffff); color: #000; }
         .bg-orange { background: linear-gradient(135deg, #aa4400, #ff6600); color: #fff; }
         .bg-pink { background: linear-gradient(135deg, #990044, #ff3388); color: #fff; }
+        
+        .dark-text { color: #000000 !important; }
 
         /* カード内の入力・操作 */
         .card-top {
@@ -195,7 +197,7 @@
             padding: 2px 0;
             border-radius: 2px;
         }
-        .dark-text .role-name-input { border-bottom: 1px solid rgba(0,0,0,0.6); }
+        .dark-text .role-name-input { border-bottom: 1px solid rgba(0,0,0,0.6); color: #000; }
         
         /* 色選択セレクトボックス */
         .color-select {
@@ -216,17 +218,74 @@
             background: rgba(0, 0, 0, 0.5);
             color: #fff;
             border: 1px solid rgba(255,255,255,0.3);
-            padding: 4px 0;
+            padding: 6px 0;
             border-radius: 6px;
             font-size: 0.75rem;
             font-weight: bold;
+            cursor: pointer;
         }
         .dark-text .btn-card-action { background: rgba(255, 255, 255, 0.6); color: #000; border: 1px solid rgba(0,0,0,0.3); }
         .btn-delete { background: rgba(200, 0, 0, 0.6) !important; color: #fff !important; }
 
+        /* チャンスゾーン（CZ）エリア */
+        .cz-section {
+            background-color: #1e1e1e;
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            border: 1px solid #ffcc00;
+        }
+        .cz-grid {
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            gap: 15px;
+            margin-top: 8px;
+        }
+        .cz-col {
+            text-align: center;
+            flex: 1;
+        }
+        .cz-count-box {
+            font-size: 2rem;
+            font-weight: bold;
+            margin: 5px 0;
+            font-family: monospace;
+        }
+        .cz-btns {
+            display: flex;
+            gap: 6px;
+        }
+        .btn-cz-ctrl {
+            flex: 1;
+            background-color: #2a2a2a;
+            border: 1px solid #444;
+            color: #fff;
+            padding: 8px 0;
+            border-radius: 4px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        .btn-cz-ctrl:active { background-color: #444; }
+        .btn-cz-plus { background-color: #ff6600; color: #fff; border: none; }
+        .btn-cz-plus:active { background-color: #cc5500; }
+        .cz-rate-banner {
+            background-color: #252525;
+            padding: 8px;
+            border-radius: 6px;
+            text-align: center;
+            font-size: 1.05rem;
+            font-weight: bold;
+            color: #00ffcc;
+            margin-top: 10px;
+            border: 1px solid #333;
+        }
+
         /* 設定判別エリア */
-        .estimation-section { background-color: #1e1e1e; padding: 12px; border-radius: 8px; border: 1px solid #2d2d2d; }
-        .section-title { font-size: 1rem; color: #ffcc00; margin: 0 0 10px 0; border-left: 4px solid #ffcc00; padding-left: 8px; }
+        .estimation-section { background-color: #1e1e1e; padding: 12px; border-radius: 8px; border: 1px solid #2d2d2d; margin-bottom: 20px; }
+        .title-container { display: flex; align-items: baseline; flex-wrap: wrap; gap: 8px; margin-bottom: 10px; }
+        .section-title { font-size: 1rem; color: #ffcc00; margin: 0; border-left: 4px solid #ffcc00; padding-left: 8px; }
+        .section-desc { font-size: 0.7rem; color: #aaa; margin: 0; font-weight: normal; }
         .est-table-scroll { overflow-x: auto; margin-bottom: 15px; }
         table { width: 100%; border-collapse: collapse; font-size: 0.8rem; text-align: center; }
         th, td { border: 1px solid #333; padding: 6px 4px; }
@@ -247,8 +306,7 @@
         .manual-step { margin-bottom: 12px; background: #252525; padding: 10px; border-radius: 6px; border-left: 3px solid #0088ff; }
         .manual-step h3 { margin: 0 0 5px 0; font-size: 0.9rem; color: #fff; }
         .manual-step p { margin: 0; font-size: 0.75rem; color: #ccc; line-height: 1.4; }
-        .btn-close { background-color: #cc1111; color: white; border: none; width: 100%; padding: 10px 0; border-radius: 6px; font-size: 1rem; font-weight: bold; margin-top: 10px; }
-        .btn-clear-all { background-color: #555; color: white; border: none; width: 100%; padding: 8px 0; border-radius: 6px; font-size: 0.85rem; margin-top: 15px; }
+        .btn-close { width: 100%; background-color: #333; color: #fff; border: 1px solid #555; padding: 8px 0; border-radius: 6px; font-weight: bold; cursor: pointer; margin-top: 10px; }
     </style>
 </head>
 <body>
@@ -257,410 +315,420 @@
     <div class="header">
         <h1>ガチ設定判別カウンター</h1>
         <div class="header-btns">
-            <button class="btn-top btn-add-role" onclick="addRoleCard()">＋ 小役を追加</button>
-            <button class="btn-top btn-manual" onclick="toggleManual(true)">マニュアル</button>
+            <button class="btn-top btn-manual" onclick="toggleModal(true)">使い方</button>
+            <button class="btn-top btn-add-role" onclick="addNewRole()">役を追加</button>
         </div>
     </div>
 
     <div class="storage-section">
         <div class="save-row">
-            <input type="text" id="model-name" class="model-name-input" placeholder="機種名を入力（例: マイジャグ5）">
-            <button class="btn-save" onclick="saveModelData()">配置を保存</button>
+            <input type="text" id="modelNameInput" class="model-name-input" placeholder="機種名・データを入力">
+            <button class="btn-save" onclick="saveCurrentData()">保存</button>
         </div>
-        <div class="load-title">▼ タップでカスタム配置を瞬時にロード</div>
-        <div class="model-list" id="saved-models-container"></div>
+        <div class="load-title">保存データ一覧（タップで読込）</div>
+        <div class="model-list" id="modelListContainer">
+            </div>
     </div>
 
     <div class="game-section">
         <div class="game-row">
-            <span class="game-label">打ち始めG数</span>
+            <div class="game-label">現在のゲーム数</div>
             <div class="game-input-wrap">
-                <input type="tel" inputmode="numeric" id="start-games" class="game-input" value="" placeholder="0" oninput="saveCurrentState(); calcAll();">
-                <button class="btn-add" onclick="addGames('start-games', 50)">+50</button>
-                <button class="btn-add" onclick="addGames('start-games', 100)">+100</button>
+                <input type="number" id="inputCurrentGames" class="game-input" value="0" oninput="updateGames()">
+                <button class="btn-add" onclick="addGames(100)">+100G</button>
+                <button class="btn-add" onclick="addGames(1000)">+1000G</button>
             </div>
         </div>
         <div class="game-row">
-            <span class="game-label">現在の総回転数</span>
+            <div class="game-label">打ち始めゲーム数</div>
             <div class="game-input-wrap">
-                <input type="tel" inputmode="numeric" id="total-games" class="game-input" value="" placeholder="0" oninput="saveCurrentState(); calcAll();">
-                <button class="btn-add" onclick="addGames('total-games', 1)">+1</button>
-                <button class="btn-add" onclick="addGames('total-games', 10)">+10</button>
-                <button class="btn-add" onclick="addGames('total-games', 100)">+100</button>
+                <input type="number" id="inputStartGames" class="game-input" value="0" oninput="updateGames()">
+                <button class="btn-add" onclick="clearGames()" style="color:#ff4444;">リセット</button>
             </div>
         </div>
-        <div class="actual-games-display">実戦ゲーム数: <span id="actual-games">0</span> G</div>
+        <div class="actual-games-display">
+            実戦回転数: <span id="displayActualGames">0</span> G
+        </div>
     </div>
 
-    <div class="counter-grid" id="counter-container"></div>
+    <div class="counter-grid" id="counterGrid">
+        </div>
+
+    <div class="cz-section">
+        <div class="section-title" style="margin-bottom: 5px;">🎯 チャンスゾーン（CZ）成功確率</div>
+        <div class="cz-grid">
+            <div class="cz-col">
+                <div style="font-size:0.8rem; color:#aaa;">CZ突入</div>
+                <div class="cz-count-box" id="czTotalNum">0</div>
+                <div class="cz-btns">
+                    <button class="btn-cz-ctrl" onclick="changeCZ('total', -1)">減</button>
+                    <button class="btn-cz-ctrl btn-cz-plus" onclick="changeCZ('total', 1)">＋</button>
+                </div>
+            </div>
+            <div class="cz-col">
+                <div style="font-size:0.8rem; color:#aaa;">CZ成功</div>
+                <div class="cz-count-box" id="czSuccessNum" style="color: #00ffcc;">0</div>
+                <div class="cz-btns">
+                    <button class="btn-cz-ctrl" onclick="changeCZ('success', -1)">減</button>
+                    <button class="btn-cz-ctrl btn-cz-plus" style="background-color:#00aa66;" onclick="changeCZ('success', 1)">＋</button>
+                </div>
+            </div>
+        </div>
+        <div class="cz-rate-banner" id="czRateDisplay">成功率: 0.0% (0 / 0)</div>
+    </div>
 
     <div class="estimation-section">
-        <h2 class="section-title">Aタイプ設定判別ツール (ベイズ推測版)</h2>
+        <div class="title-container">
+            <div class="section-title">📊 設定判別推測</div>
+            <div class="section-desc">※各小役の確率「分母」を入力してください（例: 1/120なら「120」）</div>
+        </div>
         <div class="est-table-scroll">
-            <table id="est-table">
-                <thead>
-                    <tr id="table-header-row">
-                        <th>設定</th>
-                    </tr>
-                </thead>
-                <tbody id="table-body">
-                    <tr id="est-row-1"><td style="font-weight:bold;">設定1</td></tr>
-                    <tr id="est-row-2"><td style="font-weight:bold;">設定2</td></tr>
-                    <tr id="est-row-3"><td style="font-weight:bold;">設定3</td></tr>
-                    <tr id="est-row-4"><td style="font-weight:bold;">設定4</td></tr>
-                    <tr id="est-row-5"><td style="font-weight:bold;">設定5</td></tr>
-                    <tr id="est-row-6"><td style="font-weight:bold;">設定6</td></tr>
-                </tbody>
+            <table id="estimationTable">
+                <thead id="tableHead">
+                    </thead>
+                <tbody id="tableBody">
+                    </tbody>
             </table>
         </div>
 
-        <div class="result-title">★ 設定推測結果 (掛け算・ベイズ判別)</div>
+        <div class="result-title">【推測結果】各設定の期待度</div>
         <div class="graph-container">
-            <div class="graph-row"><span class="graph-label">設定1</span><div class="graph-bar-wrap"><div id="bar-1" class="graph-bar"></div></div><span class="graph-val" id="val-1">16.7%</span></div>
-            <div class="graph-row"><span class="graph-label">設定2</span><div class="graph-bar-wrap"><div id="bar-2" class="graph-bar"></div></div><span class="graph-val" id="val-2">16.7%</span></div>
-            <div class="graph-row"><span class="graph-label">設定3</span><div class="graph-bar-wrap"><div id="bar-3" class="graph-bar"></div></div><span class="graph-val" id="val-3">16.7%</span></div>
-            <div class="graph-row"><span class="graph-label">設定4</span><div class="graph-bar-wrap"><div id="bar-4" class="graph-bar"></div></div><span class="graph-val" id="val-4">16.7%</span></div>
-            <div class="graph-row"><span class="graph-label">設定5</span><div class="graph-bar-wrap"><div id="bar-5" class="graph-bar"></div></div><span class="graph-val" id="val-5">16.7%</span></div>
-            <div class="graph-row"><span class="graph-label">設定6</span><div class="graph-bar-wrap"><div id="bar-6" class="graph-bar"></div></div><span class="graph-val" id="val-6">16.7%</span></div>
+            <script>
+                for(let i=1; i<=6; i++) {
+                    document.write(`
+                        <div class="graph-row">
+                            <div class="graph-label">設定${i}</div>
+                            <div class="graph-bar-wrap">
+                                <div class="graph-bar" id="bar-setting-${i}"></div>
+                            </div>
+                            <div class="graph-val" id="val-setting-${i}">16.7%</div>
+                        </div>
+                    `);
+                }
+            </script>
         </div>
-        
-        <button class="btn-clear-all" onclick="resetCurrentCounts()">今のカウント・G数をリセット</button>
     </div>
 </div>
 
-<div id="manual-modal" class="modal" onclick="toggleManual(false)">
-    <div class="modal-content" onclick="event.stopPropagation()">
-        <div class="modal-title">💾 機種保存・ロード機能の使い方</div>
+<div class="modal" id="manualModal">
+    <div class="modal-content">
+        <div class="modal-title">ガチ設定判別カウンターの使い方</div>
         <div class="manual-step">
-            <h3>💾 機種のテンプレート保存</h3>
-            <p>小役の名前や色、下の表の解析値をすべて入力した状態で、上の欄に機種名を入力して「配置を保存」を押すと、その設定の組み合わせを丸ごとスマホに記憶できます。</p>
+            <h3>1. 小役をカウントする</h3>
+            <p>各カードの「＋」でカウントアップ、「減」でダウンします。上の入力欄で役名変更や背景色グラデーションのカスタムが可能です。</p>
         </div>
         <div class="manual-step">
-            <h3>⚡ ワンタップ呼び出し＆消去</h3>
-            <p>保存した機種は青いチップとして並びます。タップすれば一瞬でその機種の設定データが呼び出されます。</p>
+            <h3>2. 回転数を入力する</h3>
+            <p>現在のゲーム数と打ち始めゲーム数を入力すると、実戦回転数が自動計算され、各小役のリアルタイム出現率分母が表示されます。</p>
         </div>
-        <button class="btn-close" onclick="toggleManual(false)">閉じる</button>
+        <div class="manual-step">
+            <h3>3. CZ確率をカウントする</h3>
+            <p>チャンスゾーンの突入と成功回数をそれぞれ独立してカウントし、成功確率（分数・百分率）を即座に割り出します。</p>
+        </div>
+        <div class="manual-step">
+            <h3>4. 設定を推測する</h3>
+            <p>判別エリアの表（縦が設定、横が小役）に、解析サイトなどの小役確率「分母」を入力すると、カウントされた数値と実戦回転数からリアルタイムに各設定の濃厚度をパーセンテージで可視化します。</p>
+        </div>
+        <div class="manual-step">
+            <h3>5. データの保存機能</h3>
+            <p>一番上の入力欄に機種名などを入れて「保存」を押すとデータが端末に記録され、下部のチップをタップするだけでいつでも一瞬で復元・再開できます。</p>
+        </div>
+        <button class="btn-close" onclick="toggleModal(false)">閉じる</button>
     </div>
 </div>
 
 <script>
-    // 🛠️ 初期小役データの名前と配色を指定通りに変更！
-    let roles = [
-        { id: 0, name: "チェリー", color: "red", count: 0 },
-        { id: 1, name: "スイカ", color: "green", count: 0 },
-        { id: 2, name: "ベル", color: "yellow", count: 0 },
-        { id: 3, name: "チャンス目", color: "purple", count: 0 }
+    let rolesData = [
+        { name: "チェリー", count: 0, color: "bg-red", pDenominators: ["", "", "", "", "", ""] },
+        { name: "スイカ", count: 0, color: "bg-green", pDenominators: ["", "", "", "", "", ""] },
+        { name: "ベル", count: 0, color: "bg-yellow", pDenominators: ["", "", "", "", "", ""] },
+        { name: "チャンス目", count: 0, color: "bg-purple", pDenominators: ["", "", "", "", "", ""] }
     ];
-    let nextId = 4;
-    let inputCache = {};
 
-    const colorMap = {
-        red: { class: "bg-red", label: "赤", darkText: false },
-        green: { class: "bg-green", label: "緑", darkText: false },
-        yellow: { class: "bg-yellow", label: "黄", darkText: true },
-        purple: { class: "bg-purple", label: "紫", darkText: false },
-        blue: { class: "bg-blue", label: "水", darkText: false },
-        white: { class: "bg-white", label: "白", darkText: true },
-        orange: { class: "bg-orange", label: "橙", darkText: false },
-        pink: { class: "bg-pink", label: "桃", darkText: false }
+    let czData = { total: 0, success: 0 };
+
+    const colorOptions = [
+        { val: "bg-red", label: "赤" },
+        { val: "bg-green", label: "緑" },
+        { val: "bg-yellow", label: "黄" },
+        { val: "bg-purple", label: "紫" },
+        { val: "bg-blue", label: "青" },
+        { val: "bg-white", label: "白" },
+        { val: "bg-orange", label: "橙" },
+        { val: "bg-pink", label: "桃" }
+    ];
+
+    window.onload = function() {
+        renderAll();
+        loadSavedList();
     };
 
-    function addGames(id, val) {
-        let input = document.getElementById(id);
-        input.value = (parseInt(input.value) || 0) + val;
-        saveCurrentState();
-        calcAll();
+    function renderAll() {
+        renderCards();
+        renderTable();
+        updateGames();
+        updateCZDisplay();
     }
 
-    function toggleManual(show) {
-        document.getElementById('manual-modal').style.display = show ? 'flex' : 'none';
-    }
-
-    function saveCurrentState() {
-        saveAllTableInputs();
-        const state = {
-            roles: roles,
-            nextId: nextId,
-            inputCache: inputCache,
-            startGames: document.getElementById('start-games').value,
-            totalGames: document.getElementById('total-games').value
-        };
-        localStorage.setItem('slot_counter_current_state', JSON.stringify(state));
-    }
-
-    function loadCurrentState() {
-        const saved = localStorage.getItem('slot_counter_current_state');
-        if (saved) {
-            try {
-                const state = JSON.parse(saved);
-                roles = state.roles || roles;
-                nextId = state.nextId || nextId;
-                inputCache = state.inputCache || inputCache;
-                document.getElementById('start-games').value = state.startGames || "";
-                document.getElementById('total-games').value = state.totalGames || "";
-            } catch (e) {
-                console.error("自動ロード失敗", e);
-            }
-        }
-    }
-
-    function saveModelData() {
-        const modelName = document.getElementById('model-name').value.trim();
-        if (!modelName) {
-            alert("機種名を入力してください！");
-            return;
-        }
-
-        saveAllTableInputs();
-        let models = JSON.parse(localStorage.getItem('slot_counter_models')) || {};
-        const cleanRoles = roles.map(r => ({ id: r.id, name: r.name, color: r.color, count: 0 }));
+    function renderCards() {
+        const grid = document.getElementById('counterGrid');
+        grid.innerHTML = "";
         
-        models[modelName] = {
-            roles: cleanRoles,
-            nextId: nextId,
-            inputCache: inputCache
-        };
-
-        localStorage.setItem('slot_counter_models', JSON.stringify(models));
-        document.getElementById('model-name').value = "";
-        renderSavedModels();
-        alert(`「${modelName}」の配置を設定表ごと保存しました！`);
-    }
-
-    function renderSavedModels() {
-        const container = document.getElementById('saved-models-container');
-        container.innerHTML = '';
-        const models = JSON.parse(localStorage.getItem('slot_counter_models')) || {};
-
-        const keys = Object.keys(models);
-        if (keys.length === 0) {
-            container.innerHTML = '<span style="font-size:0.8rem; color:#666;">保存された機種はありません</span>';
-            return;
-        }
-
-        keys.forEach(name => {
-            const chip = document.createElement('div');
-            chip.className = 'model-chip';
-            chip.innerHTML = `
-                <span onclick="loadModelData('${name}')">${name}</span>
-                <button class="btn-delete-chip" onclick="deleteModelData('${name}', event)">×</button>
-            `;
-            container.appendChild(chip);
-        });
-    }
-
-    function loadModelData(name) {
-        const models = JSON.parse(localStorage.getItem('slot_counter_models')) || {};
-        if (models[name]) {
-            if(confirm(`「${name}」のデータをロードしますか？\n（※現在のカウンター個数と設定表が上書きされます。現在のカウント数とG数は維持されます）`)) {
-                roles = models[name].roles.map(r => {
-                    let exist = roles.find(curr => curr.id === r.id || curr.name === r.name);
-                    return { ...r, count: exist ? exist.count : 0 };
-                });
-                nextId = models[name].nextId;
-                inputCache = models[name].inputCache;
-                
-                renderCounters();
-                saveCurrentState();
-                calcAll();
-            }
-        }
-    }
-
-    function deleteModelData(name, event) {
-        event.stopPropagation();
-        if (confirm(`「${name}」の保存データを削除してもよろしいですか？`)) {
-            let models = JSON.parse(localStorage.getItem('slot_counter_models')) || {};
-            delete models[name];
-            localStorage.setItem('slot_counter_models', JSON.stringify(models));
-            renderSavedModels();
-        }
-    }
-
-    function resetCurrentCounts() {
-        if (confirm("現在のゲーム数と小役のカウント数をすべて『0』にリセットしますか？\n（※機種の配置や設定表の数値は消えません）")) {
-            document.getElementById('start-games').value = "";
-            document.getElementById('total-games').value = "";
-            roles.forEach(r => r.count = 0);
-            renderCounters();
-            saveCurrentState();
-            calcAll();
-        }
-    }
-
-    function renderCounters() {
-        saveAllTableInputs();
-        const container = document.getElementById('counter-container');
-        container.innerHTML = '';
-
-        roles.forEach((role, index) => {
-            const cfg = colorMap[role.color];
+        rolesData.forEach((role, idx) => {
             const card = document.createElement('div');
-            card.className = `counter-card ${cfg.class} ${cfg.darkText ? 'dark-text' : ''}`;
-            card.onclick = () => { role.count++; saveCurrentState(); renderCounters(); calcAll(); };
-
-            let options = '';
-            for (let c in colorMap) {
-                options += `<option value="${c}" ${role.color === c ? 'selected' : ''}>${colorMap[c].label}</option>`;
+            card.className = `counter-card ${role.color}`;
+            if(role.color === 'bg-yellow' || role.color === 'bg-white') {
+                card.classList.add('dark-text');
             }
+
+            let selectHtml = `<select class="color-select" onchange="changeCardColor(${idx}, this.value)">`;
+            colorOptions.forEach(opt => {
+                selectHtml += `<option value="${opt.val}" ${role.color === opt.val ? 'selected' : ''}>${opt.label}</option>`;
+            });
+            selectHtml += `</select>`;
 
             card.innerHTML = `
-                <div class="card-top" onclick="event.stopPropagation()">
-                    <input type="text" class="role-name-input" value="${role.name}" onchange="updateRoleName(${index}, this.value)">
-                    <select class="color-select" onchange="updateRoleColor(${index}, this.value)">${options}</select>
+                <div class="card-top">
+                    <input type="text" class="role-name-input" value="${role.name}" onchange="changeRoleName(${idx}, this.value)">
+                    ${selectHtml}
                 </div>
-                <div class="count-num">${role.count}</div>
-                <div class="prob-display" id="runtime-prob-${role.id}">1/ -</div>
-                <div class="card-bottom-btns" onclick="event.stopPropagation()">
-                    <button class="btn-card-action" onclick="countDown(${index})">減算</button>
-                    <button class="btn-card-action btn-delete" onclick="deleteRole(${index})">削除</button>
+                <div class="count-num" id="count-val-${idx}">${role.count}</div>
+                <div class="prob-display" id="prob-val-${idx}">1/0.0</div>
+                <div class="card-bottom-btns">
+                    <button class="btn-card-action" onclick="countAction(${idx}, -1)">減</button>
+                    <button class="btn-card-action" onclick="countAction(${idx}, 1)" style="font-size:1.2rem; padding:2px 0;">＋</button>
+                    <button class="btn-card-action btn-delete" onclick="deleteRole(${idx})">消</button>
                 </div>
             `;
-            container.appendChild(card);
+            grid.appendChild(card);
         });
-
-        renderTableHeaders();
     }
 
-    function saveAllTableInputs() {
-        for (let s = 1; s <= 6; s++) {
-            roles.forEach(role => {
-                let inputEl = document.getElementById(`input-s${s}-r${role.id}`);
-                if (inputEl) {
-                    inputCache[`s${s}-r${role.id}`] = inputEl.value;
-                }
-            });
-        }
-    }
-
-    function updateRoleName(index, newName) {
-        roles[index].name = newName;
-        saveCurrentState();
-        renderTableHeaders();
-    }
-
-    function updateRoleColor(index, newColor) {
-        roles[index].color = newColor;
-        saveCurrentState();
-        renderCounters();
-    }
-
-    function countDown(index) {
-        if (roles[index].count > 0) {
-            roles[index].count--;
-            saveCurrentState();
-            renderCounters();
-            calcAll();
-        }
-    }
-
-    function addRoleCard() {
-        roles.push({ id: nextId++, name: "追加小役", color: "blue", count: 0 });
-        saveCurrentState();
-        renderCounters();
-        calcAll();
-    }
-
-    function deleteRole(index) {
-        roles.splice(index, 1);
-        saveCurrentState();
-        renderCounters();
-        calcAll();
-    }
-
-    function renderTableHeaders() {
-        const headerRow = document.getElementById('table-header-row');
-        headerRow.innerHTML = '<th>設定</th>';
+    function renderTable() {
+        const thead = document.getElementById('tableHead');
+        const tbody = document.getElementById('tableBody');
         
-        roles.forEach(role => {
-            const th = document.createElement('th');
-            th.innerText = role.name;
-            th.style.color = role.color === 'white' ? '#fff' : (role.color === 'yellow' ? '#ffff44' : colorMap[role.color].class.includes('red') ? '#ff4444' : '#00ffcc');
-            headerRow.appendChild(th);
+        let headHtml = `<tr><th style="background:#2a2a2a; color:#aaa; min-width:60px;">設定</th>`;
+        rolesData.forEach(role => {
+            headHtml += `<th>${role.name}</th>`;
         });
-
-        for (let s = 1; s <= 6; s++) {
-            const row = document.getElementById(`est-row-${s}`);
-            while (row.cells.length > 1) { row.deleteCell(1); }
+        headHtml += `</tr>`;
+        thead.innerHTML = headHtml;
+        
+        tbody.innerHTML = "";
+        for (let s = 0; s < 6; s++) {
+            const row = document.createElement('tr');
+            let tdInputs = `<td style="font-weight:bold; background:#1e1e1e; color:#fff;">設定${s + 1}</td>`;
             
-            roles.forEach(role => {
-                const td = document.createElement('td');
-                let cachedVal = inputCache[`s${s}-r${role.id}`];
-                let displayVal = (cachedVal !== undefined) ? cachedVal : "";
-                td.innerHTML = `<input type="number" id="input-s${s}-r${role.id}" class="table-input" value="${displayVal}" placeholder="-" oninput="saveCurrentState(); calcAll();">`;
-                row.appendChild(td);
+            rolesData.forEach((role, rIdx) => {
+                const val = role.pDenominators[s] !== undefined ? role.pDenominators[s] : "";
+                tdInputs += `<td><input type="number" step="any" class="table-input" value="${val}" oninput="updateTableProb(${rIdx}, ${s}, this.value)"></td>`;
             });
+            
+            row.innerHTML = tdInputs;
+            tbody.appendChild(row);
         }
     }
 
-    function logBinomialProbability(n, k, p) {
-        if (k > n || p <= 0 || p >= 1) return -Infinity;
-        function logFact(x) {
-            if (x <= 1) return 0;
-            return x * Math.log(x) - x + 0.5 * Math.log(2 * Math.PI * x);
-        }
-        let logComb = logFact(n) - (logFact(k) + logFact(n - k));
-        return logComb + k * Math.log(p) + (n - k) * Math.log(1 - p);
+    function countAction(idx, val) {
+        rolesData[idx].count = Math.max(0, rolesData[idx].count + val);
+        document.getElementById(`count-val-${idx}`).innerText = rolesData[idx].count;
+        calculateProbabilities();
     }
 
-    function calcAll() {
-        let startG = parseInt(document.getElementById('start-games').value) || 0;
-        let totalG = parseInt(document.getElementById('total-games').value) || 0;
-        let actualG = Math.max(0, totalG - startG);
-        document.getElementById('actual-games').innerText = actualG;
+    function changeRoleName(idx, name) {
+        rolesData[idx].name = name;
+        renderTable();
+    }
 
-        roles.forEach(role => {
-            let probStr = "1/ -";
-            if (role.count > 0 && actualG > 0) {
-                probStr = "1/" + (actualG / role.count).toFixed(1);
+    function changeCardColor(idx, colorClass) {
+        rolesData[idx].color = colorClass;
+        renderCards();
+    }
+
+    function updateTableProb(roleIdx, settingIdx, val) {
+        if (val === "") {
+            rolesData[roleIdx].pDenominators[settingIdx] = "";
+        } else {
+            rolesData[roleIdx].pDenominators[settingIdx] = parseFloat(val) || 0;
+        }
+        calculateProbabilities();
+    }
+
+    function addNewRole() {
+        rolesData.push({
+            name: "新小役",
+            count: 0,
+            color: "bg-blue",
+            pDenominators: ["", "", "", "", "", ""]
+        });
+        renderAll();
+    }
+
+    function deleteRole(idx) {
+        if(confirm(`${rolesData[idx].name}を削除してよろしいですか？`)) {
+            rolesData.splice(idx, 1);
+            renderAll();
+        }
+    }
+
+    function changeCZ(type, val) {
+        czData[type] = Math.max(0, czData[type] + val);
+        if (czData.success > czData.total) {
+            czData.total = czData.success;
+        }
+        updateCZDisplay();
+    }
+
+    function updateCZDisplay() {
+        document.getElementById('czTotalNum').innerText = czData.total;
+        document.getElementById('czSuccessNum').innerText = czData.success;
+        const czPercent = czData.total > 0 ? (czData.success / czData.total * 100).toFixed(1) : "0.0";
+        document.getElementById('czRateDisplay').innerText = `成功率: ${czPercent}% (${czData.success} / ${czData.total})`;
+    }
+
+    function updateGames() {
+        const cur = parseInt(document.getElementById('inputCurrentGames').value, 10) || 0;
+        const start = parseInt(document.getElementById('inputStartGames').value, 10) || 0;
+        const actual = Math.max(0, cur - start);
+        document.getElementById('displayActualGames').innerText = actual;
+        calculateProbabilities();
+    }
+
+    function addGames(val) {
+        const input = document.getElementById('inputCurrentGames');
+        input.value = (parseInt(input.value, 10) || 0) + val;
+        updateGames();
+    }
+
+    function clearGames() {
+        document.getElementById('inputCurrentGames').value = 0;
+        document.getElementById('inputStartGames').value = 0;
+        updateGames();
+    }
+
+    function calculateProbabilities() {
+        const actualGames = parseInt(document.getElementById('displayActualGames').innerText, 10) || 0;
+
+        rolesData.forEach((role, idx) => {
+            const display = document.getElementById(`prob-val-${idx}`);
+            if (role.count > 0 && actualGames > 0) {
+                display.innerText = `1/${(actualGames / role.count).toFixed(1)}`;
+            } else {
+                display.innerText = `1/0.0`;
             }
-            const el = document.getElementById(`runtime-prob-${role.id}`);
-            if (el) el.innerText = probStr;
         });
 
-        if (actualG <= 0) return;
-
-        let logLikelihoods = [0, 0, 0, 0, 0, 0];
+        let posteriors = [1/6, 1/6, 1/6, 1/6, 1/6, 1/6]; 
         let hasValidInput = false;
 
-        for (let s = 0; s < 6; s++) {
-            roles.forEach(role => {
-                let inputEl = document.getElementById(`input-s${s+1}-r${role.id}`);
-                let denom = inputEl ? parseFloat(inputEl.value) || 0 : 0;
-                
-                if (denom > 0) {
-                    hasValidInput = true;
-                    let p = 1.0 / denom;
-                    let logP = logBinomialProbability(actualG, role.count, p);
-                    logLikelihoods[s] += logP;
-                }
-            });
+        if (actualGames > 0) {
+            for (let s = 0; s < 6; s++) {
+                let logLikelihood = 0;
+                rolesData.forEach(role => {
+                    const k = role.count;
+                    const denom = role.pDenominators[s];
+                    if (denom !== "" && denom > 0) {
+                        hasValidInput = true;
+                        const p = 1 / denom;
+                        const lambda = actualGames * p;
+                        if (lambda > 0) {
+                            logLikelihood += k * Math.log(lambda) - lambda;
+                        }
+                    }
+                });
+                posteriors[s] = Math.exp(logLikelihood);
+            }
+
+            const sumPost = posteriors.reduce((a, b) => a + b, 0);
+            if (hasValidInput && sumPost > 0) {
+                posteriors = posteriors.map(p => p / sumPost);
+            } else {
+                posteriors = [1/6, 1/6, 1/6, 1/6, 1/6, 1/6];
+            }
         }
 
-        if (!hasValidInput) {
-            for (let s = 0; s < 6; s++) {
-                document.getElementById('bar-' + (s+1)).style.width = "16.7%";
-                document.getElementById('val-' + (s+1)).innerText = "16.7%";
-            }
+        for (let i = 1; i <= 6; i++) {
+            const percent = (posteriors[i - 1] * 100).toFixed(1);
+            document.getElementById(`bar-setting-${i}`).style.width = `${percent}%`;
+            document.getElementById(`val-setting-${i}`).innerText = `${percent}%`;
+        }
+    }
+
+    function saveCurrentData() {
+        const name = document.getElementById('modelNameInput').value.trim();
+        if (!name) {
+            alert("機種名またはデータ名を入力してください。");
             return;
         }
 
-        let maxLog = Math.max(...logLikelihoods);
-        let apprxProbs = logLikelihoods.map(l => Math.exp(l - maxLog));
-        let totalApprx = apprxProbs.reduce((a, b) => a + b, 0);
+        const saveData = {
+            rolesData: rolesData,
+            czData: czData,
+            curGames: document.getElementById('inputCurrentGames').value,
+            startGames: document.getElementById('inputStartGames').value
+        };
 
-        for (let s = 0; s < 6; s++) {
-            let pct = totalApprx > 0 ? (apprxProbs[s] / totalApprx) * 100 : 16.7;
-            if (isNaN(pct)) pct = 0;
-            document.getElementById(`bar-${s+1}`).style.width = pct.toFixed(1) + "%";
-            document.getElementById(`val-${s+1}`).innerText = pct.toFixed(1) + "%";
+        localStorage.setItem(`slot_data_${name}`, JSON.stringify(saveData));
+        document.getElementById('modelNameInput').value = "";
+        loadSavedList();
+        alert(`「${name}」のデータを保存しました！`);
+    }
+
+    function loadSavedList() {
+        const container = document.getElementById('modelListContainer');
+        container.innerHTML = "";
+        let count = 0;
+
+        for (let i = 0; i < localStorage.length; i++) {
+            const key = localStorage.key(i);
+            if (key.startsWith("slot_data_")) {
+                count++;
+                const displayName = key.replace("slot_data_", "");
+                const chip = document.createElement('div');
+                chip.className = 'model-chip';
+                chip.setAttribute('onclick', `loadData('${key}')`);
+                chip.innerHTML = `
+                    <span>${displayName}</span>
+                    <button class="btn-delete-chip" onclick="deleteData('${key}', event)">×</button>
+                `;
+                container.appendChild(chip);
+            }
+        }
+        if(count === 0) {
+            container.innerHTML = `<div style="font-size:0.75rem; color:#555;">保存されたデータはありません</div>`;
         }
     }
 
-    loadCurrentState();
-    renderCounters();
-    renderSavedModels();
-    calcAll();
+    function loadData(key) {
+        const data = JSON.parse(localStorage.getItem(key));
+        if (data) {
+            rolesData = data.rolesData;
+            rolesData.forEach(role => {
+                if(!role.pDenominators) {
+                    role.pDenominators = ["", "", "", "", "", ""];
+                }
+            });
+            czData = data.czData || { total: 0, success: 0 };
+            document.getElementById('inputCurrentGames').value = data.curGames || 0;
+            document.getElementById('inputStartGames').value = data.startGames || 0;
+            renderAll();
+            alert(`「${key.replace("slot_data_", "")}」のデータを読み込みました！`);
+        }
+    }
+
+    function deleteData(key, event) {
+        event.stopPropagation();
+        const displayName = key.replace("slot_data_", "");
+        if (confirm(`「${displayName}」のセーブデータを削除しますか？`)) {
+            localStorage.removeItem(key);
+            loadSavedList();
+        }
+    }
+
+    function toggleModal(show) {
+        document.getElementById('manualModal').style.display = show ? 'flex' : 'none';
+    }
 </script>
 
 </body>
